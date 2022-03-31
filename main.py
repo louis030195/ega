@@ -3,12 +3,17 @@ import schedule
 import time
 import fire
 import logging
-from datasets import Dataset, DatasetInfo, load_from_disk
+from datasets import Dataset, DatasetInfo
 import gcsfs
 import os
+from google.cloud import storage
 
 
-def publish(bucket_name: str = "ega-030195", frequency_in_hours: int = 10):
+def publish(
+    bucket_name: str = "ega-030195",
+    frequency_in_hours: int = 10,
+    logs_path: str = "~/Desktop/ega.log",
+):
     """
     Regularly fetch and publish your Google Chrome history
     :param bucket_name: Name of the GCS bucket to publish to
@@ -17,16 +22,20 @@ def publish(bucket_name: str = "ega-030195", frequency_in_hours: int = 10):
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        # ~/Desktop/ega.log
-        filename=os.path.expanduser("~/Desktop/ega.log"),
+        filename=os.path.expanduser(logs_path),
     )
 
-    logging.info("Publishing Google Chrome history")
+    logging.info("Synchronizing Google Chrome history")
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+    if not bucket.exists():
+        logging.info(f"Bucket {bucket_name} does not exist, creating")
+        storage_client.create_bucket(bucket_name)
 
     gcs = gcsfs.GCSFileSystem()
 
     def job():
-        # check if google chrome is running
         try:
             history = get_browserhistory()
             # turn [[url,title,date]] into {"url": [urls], "title": [titles], "date": [dates]}
@@ -47,6 +56,7 @@ def publish(bucket_name: str = "ega-030195", frequency_in_hours: int = 10):
             gcs_path = f"gcs://{bucket_name}"
             version = "0.0.1"
             try:
+                # TODO: append history
                 raise NotImplementedError
                 # dataset = load_from_disk(bucket_name, fs=gcs)
                 # append rows to existing dataset and update version
