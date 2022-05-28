@@ -14,16 +14,41 @@ See [issues](https://github.com/louis030195/ega/issues) for discussing ideas.
 - No software exists to collect private data.
 - Thus, softwares cannot use private data to build AI models.
 
+## Features
+
+Regularly export desktop Chrome history as a [Huggingface dataset](https://huggingface.co/datasets) hosted on Google Cloud storage and as a [Google Cloud BigQuery](https://cloud.google.com/bigquery) table.
+
 ## Usage
 
 ```bash
 gcloud projects list
 gcloud config set project MY_PROJECT
+# generate service account key file for owner
+OWNER=$(gcloud iam service-accounts list --filter="displayName:owner" --format="value(email)")
+gcloud iam service-accounts keys create key.json --iam-account=${OWNER}
+export GOOGLE_APPLICATION_CREDENTIALS=key.json
+python3 main.py --logs_path=None
 ```
+
+![bigquery](docs/bigquery.png)
 
 ### MacOS script on boot
 
 https://stackoverflow.com/questions/6442364/running-script-upon-login-mac
+
+Using a [Automator](https://support.apple.com/en-au/guide/automator/welcome/mac) script
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS="PATH_TO_MY_JSON_SERVICE_ACCOUNT" GOOGLE_CLOUD_PROJECT="MY_GCP_PROJECT" PATH_TO_MY_VIRTUALENV_BIN/python3 PATH_TO_MY_EGA_DIR/main.py --bucket_name="MY_BUCKET" &> PATH_TO_LOGS/ega.log
+```
+
+### Linux cron
+
+Something similar to above but in cron 😇
+
+### Windows
+
+We are in 2022 guys.
 
 ## Analytics
 

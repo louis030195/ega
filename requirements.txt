@@ -1,5 +1,6 @@
 schedule
 fire
 google-cloud-storage
+google-cloud-bigquery
 datasets[s3]
 gcsfs
