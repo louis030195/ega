@@ -2,6 +2,8 @@
 
 ⚠️ Highly experimental ⚠️
 
+>If you cannot measure it, you cannot improve it. ~ Lord Kelvin
+
 Ego but female, because all AI assistants are female.
 
 The goal is to implement tools that
