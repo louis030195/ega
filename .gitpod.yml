@@ -1,7 +1,11 @@
 
 tasks:
-  - init: pip install -r requirements.txt requirements-test.txt
-
+  - init: pip install -r requirements.txt && pip install -r requirements-test.txt
+  - name: Secrets
+    command: |
+      eval $(gp env -e)
+      echo "$OURARING_TOKEN" > .env
+      echo "$TIMINGAPP_TOKEN" >> .env
 image:
   file: .gitpod.Dockerfile
 
@@ -9,6 +13,11 @@ vscode:
   # list as bullet points installed extensions:
   # code --list-extensions | xargs -L 1 echo - 
   extensions:
+    - ms-python.python
+    - ms-python.vscode-pylance
+    - ms-toolsai.jupyter
+    - ms-toolsai.jupyter-keymap
+    - ms-toolsai.jupyter-renderers
     - github.copilot
     - toba.vsfire
     - wix.vscode-import-cost
@@ -18,9 +27,4 @@ vscode:
     - k--kato.intellij-idea-keybindings
     - GitHub.vscode-pull-request-github
     - gitpod.gitpod-remote-ssh
-    - ms-python.python
-    - ms-python.vscode-pylance
-    - ms-toolsai.jupyter
-    - ms-toolsai.jupyter-keymap
-    - ms-toolsai.jupyter-renderers
     - redhat.vscode-yaml
