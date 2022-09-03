@@ -1,0 +1,26 @@
+
+tasks:
+  - init: pip install -r requirements.txt requirements-test.txt
+
+image:
+  file: .gitpod.Dockerfile
+
+vscode:
+  # list as bullet points installed extensions:
+  # code --list-extensions | xargs -L 1 echo - 
+  extensions:
+    - github.copilot
+    - toba.vsfire
+    - wix.vscode-import-cost
+    - aaron-bond.better-comments
+    - littlefoxteam.vscode-python-test-adapter
+    - randomfractalsinc.vscode-data-preview
+    - k--kato.intellij-idea-keybindings
+    - GitHub.vscode-pull-request-github
+    - gitpod.gitpod-remote-ssh
+    - ms-python.python
+    - ms-python.vscode-pylance
+    - ms-toolsai.jupyter
+    - ms-toolsai.jupyter-keymap
+    - ms-toolsai.jupyter-renderers
+    - redhat.vscode-yaml
