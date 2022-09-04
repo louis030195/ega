@@ -35,13 +35,16 @@ codegen: ## [LOCAL DEVELOPMENT] Generate clients from openapi configurations
 	rm -rf tmp_ouraring tmp_timingapp openapitools.json
 
 
-ifeq (0,1)
-# To schedule gcloud job pubsub
+
+fn/experiment/start:
 	gcloud scheduler jobs create pubsub ega_experiment \
 		--schedule "every 24 hours" \
 		--topic ega_experiment \
-		--message-body "Hello, World!"
-endif
+		--message-body $$EXPERIMENT_NAME
+
+fn/experiment/stop:
+	gcloud scheduler jobs delete ega_experiment
+# TODO: complete the wandb experiment here
 
 fn/experiment/deploy: deps ## [Local development] Deploy the function.
 	gcloud beta functions deploy ega_experiment \

@@ -14,3 +14,6 @@ def ega_experiment(event, context):
         None; the output is written to Cloud Logging
     """
     pass
+    # wandb init current experiment (experiment name is in event data) or starts new one
+    # query APIs, aggregate in wandb experiment
+    # add tags to the experiment wandb.Run according to tags (ouraring tags, timingapp, etc.)
