@@ -57,7 +57,25 @@ fn/experiment/deploy: deps ## [Local development] Deploy the function.
 		--memory 1024MB \
 		--source functions/experiment
 
+fn/public/deploy: deps ## [Local development] Deploy the "public" function.
+# TODO: custom domain name
+# firebase use ${GCLOUD_PROJECT}
+# firebase deploy --only hosting
+	gcloud functions deploy ega_public \
+		--runtime python39 \
+		--trigger-http \
+		--allow-unauthenticated \
+		--project ${GCLOUD_PROJECT} \
+		--timeout 540s \
+		--set-env-vars OURARING_TOKEN=${OURARING_TOKEN} \
+		--source ./functions/public \
+		--region ${REGION} \
+		--memory 1024MB
+
 .PHONY: help
 
 help: # Run `make help` to get help on the make commands
 	@grep -E '^[0-9a-zA-Z\/_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+# gcloud projects add-iam-policy-binding ${GCLOUD_PROJECT} --project ${GCLOUD_PROJECT} --member "serviceAccount:596120869120@cloudbuild.gserviceaccount.com" --role "roles/storage.objectViewer"
