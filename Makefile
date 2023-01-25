@@ -3,6 +3,10 @@ REGION := europe-west1
 OURARING_TOKEN := $(shell cat .env | grep -w OURARING_TOKEN | cut -d "=" -f 2)
 TIMINGAPP_TOKEN := $(shell cat .env | grep -w TIMINGAPP_TOKEN | cut -d "=" -f 2)
 WANDB_TOKEN := $(shell cat .env | grep -w WANDB_TOKEN | cut -d "=" -f 2)
+LASTFM_API_KEY := $(shell cat .env | grep -w LASTFM_API_KEY | cut -d "=" -f 2)
+LASTFM_API_SECRET := $(shell cat .env | grep -w LASTFM_API_SECRET | cut -d "=" -f 2)
+LASTFM_USERNAME := $(shell cat .env | grep -w LASTFM_USERNAME | cut -d "=" -f 2)
+LASTFM_PASSWORD := $(shell cat .env | grep -w LASTFM_PASSWORD | cut -d "=" -f 2)
 
 # Warn the user if no .env is found here
 # using makefile syntax
@@ -71,6 +75,27 @@ fn/public/deploy: deps ## [Local development] Deploy the "public" function.
 		--source ./functions/public \
 		--region ${REGION} \
 		--memory 1024MB
+
+fn/youtube_music_to_lastfm/setup:
+	gcloud pubsub topics create youtube_music_to_lastfm
+	gcloud scheduler jobs create pubsub youtube_music_to_lastfm \
+		--schedule "every 24 hours" \
+		--topic youtube_music_to_lastfm \
+		--location ${REGION} \
+		--message-body "youtube_music_to_lastfm"
+
+fn/youtube_music_to_lastfm/deploy:
+	gcloud functions deploy youtube-music-to-lastfm \
+		--runtime python310 \
+		--gen2 \
+		--project ${GCLOUD_PROJECT} \
+		--trigger-topic=youtube_music_to_lastfm \
+		--region ${REGION} \
+		--source=functions/youtube_music_to_lastfm \
+		--set-env-vars LASTFM_API_KEY=${LASTFM_API_KEY},LASTFM_API_SECRET=${LASTFM_API_SECRET},LASTFM_USERNAME=${LASTFM_USERNAME},LASTFM_PASSWORD=${LASTFM_PASSWORD} \
+		--max-instances 1
+
+
 
 .PHONY: help
 

@@ -1,0 +1,4 @@
+functions-framework
+ytmusicapi
+pylast
+# dotenv

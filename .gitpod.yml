@@ -4,8 +4,13 @@ tasks:
   - name: Secrets
     command: |
       eval $(gp env -e)
-      echo "$OURARING_TOKEN" > .env
-      echo "$TIMINGAPP_TOKEN" >> .env
+      echo "OURARING_TOKEN=$OURARING_TOKEN" > .env
+      echo "TIMINGAPP_TOKEN=$TIMINGAPP_TOKEN" >> .env
+      echo "YOUTUBE_MUSIC_COOKIE=$YOUTUBE_MUSIC_COOKIE" >> .env
+      echo "LASTFM_API_KEY=$LASTFM_API_KEY" >> .env
+      echo "LASTFM_API_SECRET=$LASTFM_API_SECRET" >> .env
+      echo "LASTFM_USERNAME=$LASTFM_USERNAME" >> .env
+      echo "LASTFM_PASSWORD=$LASTFM_PASSWORD" >> .env
 image:
   file: .gitpod.Dockerfile
 
