@@ -7,12 +7,20 @@ LASTFM_API_KEY := $(shell cat .env | grep -w LASTFM_API_KEY | cut -d "=" -f 2)
 LASTFM_API_SECRET := $(shell cat .env | grep -w LASTFM_API_SECRET | cut -d "=" -f 2)
 LASTFM_USERNAME := $(shell cat .env | grep -w LASTFM_USERNAME | cut -d "=" -f 2)
 LASTFM_PASSWORD := $(shell cat .env | grep -w LASTFM_PASSWORD | cut -d "=" -f 2)
+# get rid of '' in the string
+YOUTUBE_MUSIC_HEADERS := $(shell cat .env | grep -w YOUTUBE_MUSIC_HEADERS | cut -d "=" -f 2- | sed "s/'//g")
 
 # Warn the user if no .env is found here
 # using makefile syntax
 ifeq (, $(shell ls .env))
 $(error "No .env file found. Please create one with the appropriate variables.")
 endif
+
+install:
+	virtualenv env; \
+	. env/bin/activate; \
+	pip install -r requirements.txt; \
+	pip install -r requirements-test.txt
 
 
 deps:
@@ -85,15 +93,19 @@ fn/youtube_music_to_lastfm/setup:
 		--message-body "youtube_music_to_lastfm"
 
 fn/youtube_music_to_lastfm/deploy:
-	gcloud functions deploy youtube-music-to-lastfm \
+# write YOUTUBE_MUSIC_HEADERS to functions/youtube_music_to_lastfm/headers.json
+# echo ${YOUTUBE_MUSIC_HEADERS} > functions/youtube_music_to_lastfm/headers.json
+# cat .env | grep -w YOUTUBE_MUSIC_HEADERS | cut -d "=" -f 2- | sed "s/'//g" > functions/youtube_music_to_lastfm/headers.json
+
+	gcloud functions deploy youtubee \
 		--runtime python310 \
-		--gen2 \
 		--project ${GCLOUD_PROJECT} \
 		--trigger-topic=youtube_music_to_lastfm \
 		--region ${REGION} \
 		--source=functions/youtube_music_to_lastfm \
 		--set-env-vars LASTFM_API_KEY=${LASTFM_API_KEY},LASTFM_API_SECRET=${LASTFM_API_SECRET},LASTFM_USERNAME=${LASTFM_USERNAME},LASTFM_PASSWORD=${LASTFM_PASSWORD} \
 		--max-instances 1
+# rm -rf functions/youtube_music_to_lastfm/headers.json
 
 
 

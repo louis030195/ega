@@ -1,15 +1,12 @@
 import json
 import os
 import time
-import functions_framework
+# import functions_framework
 from ytmusicapi import YTMusic
 # from dotenv import load_dotenv
 import pylast
 import hashlib
 # load_dotenv()
-
-YOUTUBE_MUSIC_COOKIE = os.environ.get("YOUTUBE_MUSIC_COOKIE")
-assert YOUTUBE_MUSIC_COOKIE, "YOUTUBE_MUSIC_COOKIE is not set"
 
 API_KEY = os.environ.get("LASTFM_API_KEY")
 API_SECRET = os.environ.get("LASTFM_API_SECRET")
@@ -18,24 +15,10 @@ username = os.environ.get("LASTFM_USERNAME")
 password_hash = pylast.md5(os.environ.get("LASTFM_PASSWORD"))
 assert API_KEY, "LASTFM_API_KEY is not set"
 
-d = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0",
-    "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Content-Type": "application/json",
-    "X-Goog-AuthUser": "0",
-    "x-origin": "https://music.youtube.com",
-    # "Cookie: "..."
-}
-
-with open("headers.json", "w") as f:
-    d["Cookie"] = YOUTUBE_MUSIC_COOKIE
-    json.dump(d, f)
-
 
 # Triggered from a message on a Cloud Pub/Sub topic.
-@functions_framework.cloud_event
-def youtube_music_to_lastfm(cloud_event):
+# @functions_framework.cloud_event
+def youtubee(_, __):
     ytmusic = YTMusic(auth=f"headers.json")
     history = ytmusic.get_history()
 
@@ -56,10 +39,10 @@ def youtube_music_to_lastfm(cloud_event):
         h = hashlib.sha256()
         hh = h.update(f"{track['title']}{track['artists'][0]['name']}".encode("utf-8"))
         unique_tracks[hh] = (track["title"], track["artists"][0]["name"])
-    for track in last_scrobble:
+    for s in last_scrobble:
         h = hashlib.sha256()
-        hh = h.update(f"{track.title}{track.artist}".encode("utf-8"))
-        unique_tracks[hh] = (track.title, track.artist)
+        hh = h.update(f"{s.track.title}{s.track.artist}".encode("utf-8"))
+        unique_tracks[hh] = (s.track.title, s.track.artist)
 
     print("Scrobbling...")
     for track in unique_tracks.values():
