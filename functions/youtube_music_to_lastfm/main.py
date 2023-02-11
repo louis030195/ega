@@ -3,10 +3,15 @@ import os
 import time
 # import functions_framework
 from ytmusicapi import YTMusic
-# from dotenv import load_dotenv
 import pylast
 import hashlib
-# load_dotenv()
+try:
+    # pip install python-dotenv
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception as e:
+    print(e)
+    pass
 
 API_KEY = os.environ.get("LASTFM_API_KEY")
 API_SECRET = os.environ.get("LASTFM_API_SECRET")
@@ -36,13 +41,11 @@ def youtubee(_, __):
     # merge in one set with id hash of title+artist
     unique_tracks = {}
     for track in history:
-        h = hashlib.sha256()
-        hh = h.update(f"{track['title']}{track['artists'][0]['name']}".encode("utf-8"))
-        unique_tracks[hh] = (track["title"], track["artists"][0]["name"])
+        h = hash(f"{track['title']}{track['artists'][0]['name']}".encode("utf-8"))
+        unique_tracks[h] = (track["title"], track["artists"][0]["name"])
     for s in last_scrobble:
-        h = hashlib.sha256()
-        hh = h.update(f"{s.track.title}{s.track.artist}".encode("utf-8"))
-        unique_tracks[hh] = (s.track.title, s.track.artist)
+        h = hash(f"{s.track.title}{s.track.artist}".encode("utf-8"))
+        unique_tracks[h] = (s.track.title, s.track.artist)
 
     print("Scrobbling...")
     for track in unique_tracks.values():
@@ -53,3 +56,5 @@ def youtubee(_, __):
         network.scrobble(artist=artist, title=title, timestamp=timestamp)
 
     print("Done!")
+
+# youtubee(None, None)

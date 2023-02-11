@@ -23,6 +23,11 @@ install:
 	pip install -r requirements-test.txt
 
 
+push:
+	git add .
+	git commit -m "🙈 $(shell date +%Y-%m-%d_%H:%M:%S) 🙈"
+	git push -f
+
 deps:
 	@which gcloud >/dev/null || { echo "gcloud not found in PATH"; exit 1; }
 # @which firebase >/dev/null || { echo "firebase not found in PATH"; exit 1; }
