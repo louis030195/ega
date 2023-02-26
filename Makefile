@@ -89,10 +89,12 @@ fn/public/deploy: deps ## [Local development] Deploy the "public" function.
 		--region ${REGION} \
 		--memory 1024MB
 
+# At 23:50
+
 fn/youtube_music_to_lastfm/setup:
 	gcloud pubsub topics create youtube_music_to_lastfm
 	gcloud scheduler jobs create pubsub youtube_music_to_lastfm \
-		--schedule "every 24 hours" \
+		--schedule "50 23 * * *" \ 
 		--topic youtube_music_to_lastfm \
 		--location ${REGION} \
 		--message-body "youtube_music_to_lastfm"
