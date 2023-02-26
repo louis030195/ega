@@ -6,7 +6,7 @@ tasks:
       eval $(gp env -e)
       echo "OURARING_TOKEN=\"$OURARING_TOKEN\"" > .env
       echo "TIMINGAPP_TOKEN=\"$TIMINGAPP_TOKEN\"" >> .env
-      echo "YOUTUBE_MUSIC_HEADERS=$YOUTUBE_MUSIC_HEADERS" >> .env
+      echo $YOUTUBE_MUSIC_HEADERS > headers.json
       echo "LASTFM_API_KEY=\"$LASTFM_API_KEY\"" >> .env
       echo "LASTFM_API_SECRET=\"$LASTFM_API_SECRET\"" >> .env
       echo "LASTFM_USERNAME=\"$LASTFM_USERNAME\"" >> .env

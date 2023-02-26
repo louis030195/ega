@@ -21,11 +21,18 @@ password_hash = pylast.md5(os.environ.get("LASTFM_PASSWORD"))
 assert API_KEY, "LASTFM_API_KEY is not set"
 
 
+# check headers.json is here
+if not os.path.exists("headers.json"):
+    print("headers.json not found, please run the setup script")
+    exit(1)
+
 # Triggered from a message on a Cloud Pub/Sub topic.
 # @functions_framework.cloud_event
 def youtubee(_, __):
     ytmusic = YTMusic(auth=f"headers.json")
     history = ytmusic.get_history()
+    # filter by 'played' = today
+    history = [x for x in history if x["played"] == "Today"]
 
     print(f"Logging in as {username}...")
     network = pylast.LastFMNetwork(
@@ -36,25 +43,33 @@ def youtubee(_, __):
     )
 
     lastfm_user = network.get_user(username)
-    last_scrobble = list(lastfm_user.get_recent_tracks())
+    last_scrobble = list(lastfm_user.get_recent_tracks(limit=999))
 
     # merge in one set with id hash of title+artist
-    unique_tracks = {}
-    for track in history:
-        h = hash(f"{track['title']}{track['artists'][0]['name']}".encode("utf-8"))
-        unique_tracks[h] = (track["title"], track["artists"][0]["name"])
+    existing_tracks = {}
+    new_tracks = {}
     for s in last_scrobble:
         h = hash(f"{s.track.title}{s.track.artist}".encode("utf-8"))
-        unique_tracks[h] = (s.track.title, s.track.artist)
+        existing_tracks[h] = (s.track.title, str(s.track.artist))
 
+    for track in history:
+        h = hash(f"{track['title']}{track['artists'][0]['name']}".encode("utf-8"))
+        if h in existing_tracks:
+            print(f"Skipping {track['title']} - {track['artists'][0]['name']}")
+            continue
+        new_tracks[h] = (track["title"], track["artists"][0]["name"])
+    
+    # print("existing tracks:", existing_tracks)
+    # print("new tracks:", new_tracks)
+    # return
     print("Scrobbling...")
-    for track in unique_tracks.values():
+    for track in new_tracks.values():
         artist = track[1]
         title = track[0]
         timestamp = int(time.time())
         print(f"Scrobbling {artist} - {title} at {timestamp} to {lastfm_user}...")
-        network.scrobble(artist=artist, title=title, timestamp=timestamp)
+        # network.scrobble(artist=artist, title=title, timestamp=timestamp)
 
     print("Done!")
 
-# youtubee(None, None)
+youtubee(None, None)
