@@ -68,7 +68,7 @@ def youtubee(_, __):
         title = track[0]
         timestamp = int(time.time())
         print(f"Scrobbling {artist} - {title} at {timestamp} to {lastfm_user}...")
-        # network.scrobble(artist=artist, title=title, timestamp=timestamp)
+        network.scrobble(artist=artist, title=title, timestamp=timestamp)
 
     print("Done!")
 
